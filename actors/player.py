@@ -12,6 +12,7 @@ class Player(pygame.sprite.Sprite):
     BLACK = (0, 0, 0)
     SHOOT_SOUND_1 = None
     SHOOT_SOUND_2 = None
+    SHIELD = 100
 
     def __init__(self, settings):
         pygame.sprite.Sprite.__init__(self)
@@ -19,6 +20,7 @@ class Player(pygame.sprite.Sprite):
         self.PLAYER_SPEED = settings.PLAYER_SPEED
         self.SCREEN_WIDTH = settings.WIDTH
         self.SCREEN_HEIGHT = settings.HEIGHT
+        self.shield = self.SHIELD
         self.SHOOT_SOUND_1 = pygame.mixer.Sound(path.join(path.dirname(__file__), 'player/laser.wav'))
         self.SHOOT_SOUND_1.set_volume(settings.GUN_VOLUME)
         self.SHOOT_SOUND_2 = pygame.mixer.Sound(path.join(path.dirname(__file__), 'player/laser2.wav'))
@@ -49,6 +51,12 @@ class Player(pygame.sprite.Sprite):
                 self.speedx = self.PLAYER_SPEED
         self.rect.x += self.speedx
     
+    def update_shield(self, damage):
+        self.shield -= damage
+        if (self.shield <= 0):
+            return False #Player is dead
+        return True #Player is still alive
+
     def shoot(self):
         # Level 1 and 2 shoot  1 bullet
         # @TODO when two earth start do we keep two bullets?
