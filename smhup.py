@@ -35,6 +35,8 @@ payload_count = 1
 current_level = 1
 mine_count = 3
 enemy_count = settings.ENEMY_NR_START
+stage = 1
+bos_time = False
 
 # Load assets
 background_image = pygame.transform.scale(pygame.image.load(path.join(settings.IMG_DIR, 'starfield.png')).convert(),(settings.WIDTH,settings.HEIGHT))
@@ -67,10 +69,6 @@ all_sprites.add(payload)
 
 payload_group.add(payload)
 
-for i in range(settings.ENEMY_NR_START):
-    mob = Mob(settings, current_level)
-    mobs_group.add(mob)
-    all_sprites.add(mob)
 
 pygame.mixer.music.play(loops=-1)
 running = True
@@ -116,9 +114,9 @@ def determine_level(current_level, hit_count):
     if (hit_count % settings.LEVEL_UP) == 0:
         mine_count = 3
         current_level += 1 # Level Up
-        enemy_count += 1
-        if enemy_count < 16:
-            add_one_mob()
+        #enemy_count += 1
+        #if enemy_count < 16:
+        #    add_one_mob()
         if current_level < 3 or (current_level > 4 and current_level < 6):
             player.bullet_count = Player.BULLET_COUNT_1
         else:
@@ -155,12 +153,6 @@ def add_one_mob():
     mobs_group.add(mob)
     all_sprites.add(mob)
 
-def add_mob_back(current_hits, current_level):
-    for x in range(current_hits):
-        mob = Mob(settings, current_level)
-        mobs_group.add(mob)
-        all_sprites.add(mob)
-
 def check_for_player_collision():
     global running
     hits = pygame.sprite.spritecollide(player, mobs_group, True, pygame.sprite.collide_circle) 
@@ -168,6 +160,26 @@ def check_for_player_collision():
         damage = hit.radius * 2
         running = player.update_shield(damage)
         add_one_mob()
+
+def end_of_stage_bos(stage):
+    if stage == 1:
+        #Create a swarm mob
+        for x in range(40):
+            add_one_mob()
+
+def check_done(stage):
+    if stage == 1:
+        return not mobs_group
+    return True #No more sprites left
+
+def add_mob(nr):
+    for i in range(nr):
+        add_one_mob()
+
+def next_stage(stage):
+    add_mob(settings.ENEMY_NR_START + stage)
+
+add_mob(settings.ENEMY_NR_START)
 
 while running:
     clock.tick(settings.FPS)    
@@ -182,13 +194,22 @@ while running:
 
     # check for bullet collisions
     current_hits = check_for_bullet_collisions()
+    hit_count += current_hits
     # add mob back
     if (current_hits > 0):
-        add_mob_back(current_hits, current_level)
-        # determine level
-        hit_count += current_hits
-        current_level = determine_level(current_level, hit_count)    
-
+        if not bos_time:
+            add_mob(current_hits) # replace the enemies
+            current_level = determine_level(current_level, hit_count)
+            if current_level > 7:
+                bos_time = True
+                end_of_stage_bos(stage) 
+        else: 
+            if check_done(stage):
+                print("You did it")
+                stage += 1
+                current_level = 1
+                bos_time = False
+                next_stage(stage)
     # The boolean value is do kill if true it would remove mob from mobs_group e.g. coin pickup
     check_for_player_collision()
     
