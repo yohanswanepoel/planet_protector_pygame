@@ -90,6 +90,17 @@ def process_inputs():
                 # DROP a mine
                 pass
 
+def draw_shield_bar(surf, x, y, pct):
+    if pct < 0:
+        pct = 0
+    BAR_LENGTH = 100
+    BAR_HEIGHT = 10 
+    fil = (pct / 100) * BAR_LENGTH
+    outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
+    fill_rect = pygame.Rect(x, y, fil, BAR_HEIGHT)
+    pygame.draw.rect(surf, settings.GREEN, fill_rect)
+    pygame.draw.rect(surf, settings.WHITE, outline_rect, 2)
+
 def check_for_payload_collissions():
     global payload_count
     global running
@@ -121,7 +132,7 @@ def determine_level(current_level, hit_count):
             player.bullet_count = Player.BULLET_COUNT_1
         else:
             player.bullet_count = Player.BULLET_COUNT_2
-        if current_level == 5:
+        if current_level == 5 and payload_count == 1:
             # Time for two moons
             add_second_earth()
         elif payload_count == 1:
@@ -177,6 +188,11 @@ def add_mob(nr):
         add_one_mob()
 
 def next_stage(stage):
+    # Increase Player Shield 
+    if payload_count == 2:
+        player.shield = 100
+    else
+        player.shield = 75
     add_mob(settings.ENEMY_NR_START + stage)
 
 add_mob(settings.ENEMY_NR_START)
@@ -217,7 +233,8 @@ while running:
     screen.fill(settings.BLACK)
     screen.blit(background_image, background_rect)
     all_sprites.draw(screen)
-    draw_text(font_name, settings.WHITE, screen, 'Level %d - Mines %d - Hits %d - Shield %d' % (current_level, mine_count, hit_count, player.shield), 18, settings.WIDTH / 2, 10)
+    draw_text(font_name, settings.WHITE, screen, 'S %d L %d - Mines %d - Score %d' % (stage, current_level, mine_count, hit_count), 18, settings.WIDTH / 2, 10)
+    draw_shield_bar(screen, 5, 5, player.shield)
     # After the drawing flip the screen to display
     pygame.display.flip()
     
