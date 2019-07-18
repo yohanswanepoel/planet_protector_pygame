@@ -191,7 +191,7 @@ def next_stage(stage):
     # Increase Player Shield 
     if payload_count == 2:
         player.shield = 100
-    else
+    else:
         player.shield = 75
     add_mob(settings.ENEMY_NR_START + stage)
 
