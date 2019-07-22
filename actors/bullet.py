@@ -14,7 +14,7 @@ class Bullet(pygame.sprite.Sprite):
 
     def __init__(self, x, y):
         pygame.sprite.Sprite.__init__(self)
-        self.bullet_image= bullet_image = pygame.image.load(path.join(path.dirname(__file__), 'player/laserRed16.png')).convert()
+        self.bullet_image = pygame.image.load(path.join(path.dirname(__file__), 'player/laserRed16.png')).convert()
         self.image = pygame.transform.scale(self.bullet_image, (10,20))
         self.image.set_colorkey(self.BLACK)
         self.rect = self.image.get_rect()
