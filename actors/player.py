@@ -13,6 +13,7 @@ class Player(pygame.sprite.Sprite):
     SHOOT_SOUND_1 = None
     SHOOT_SOUND_2 = None
     SHIELD = 100
+    SHOOT_DELAY = 200
 
     def __init__(self, settings):
         pygame.sprite.Sprite.__init__(self)
@@ -21,6 +22,8 @@ class Player(pygame.sprite.Sprite):
         self.SCREEN_WIDTH = settings.WIDTH
         self.SCREEN_HEIGHT = settings.HEIGHT
         self.shield = self.SHIELD
+        self.shoot_delay = self.SHOOT_DELAY
+        self.last_shot = pygame.time.get_ticks()
         self.SHOOT_SOUND_1 = pygame.mixer.Sound(path.join(path.dirname(__file__), 'player/laser.wav'))
         self.SHOOT_SOUND_1.set_volume(settings.GUN_VOLUME)
         self.SHOOT_SOUND_2 = pygame.mixer.Sound(path.join(path.dirname(__file__), 'player/laser2.wav'))
@@ -61,13 +64,16 @@ class Player(pygame.sprite.Sprite):
         # Level 1 and 2 shoot  1 bullet
         # @TODO when two earth start do we keep two bullets?
         #if current_level < 3 or (current_level > 4 and current_level < 6):
-        if self.bullet_count == self.BULLET_COUNT_1:
-            bullet = Bullet(self.rect.centerx, self.rect.top + 5)
-            self.SHOOT_SOUND_1.play()
-            return bullet
-        else:
-            bullet_l = Bullet(self.rect.left, self.rect.top + 8)
-            bullet_r = Bullet(self.rect.right, self.rect.top + 8)
-            self.SHOOT_SOUND_2.play()
-            return bullet_l, bullet_r
+        now = pygame.time.get_ticks()
+        if now - self.last_shot > self.shoot_delay:
+            self.last_shot = now
+            if self.bullet_count == self.BULLET_COUNT_1:
+                bullet = Bullet(self.rect.centerx, self.rect.top + 5)
+                self.SHOOT_SOUND_1.play()
+                return bullet
+            else:
+                bullet_l = Bullet(self.rect.left, self.rect.top + 8)
+                bullet_r = Bullet(self.rect.right, self.rect.top + 8)
+                self.SHOOT_SOUND_2.play()
+                return bullet_l, bullet_r
 

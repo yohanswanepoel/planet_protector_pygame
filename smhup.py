@@ -82,8 +82,9 @@ def process_inputs():
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
                 new_bullets = player.shoot()
-                all_sprites.add(new_bullets)
-                bullets_group.add(new_bullets)
+                if new_bullets:
+                    all_sprites.add(new_bullets)
+                    bullets_group.add(new_bullets)
             if event.key == pygame.K_ESCAPE:
                 running = False
             if event.key == pygame.K_b:
