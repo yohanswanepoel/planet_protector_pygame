@@ -37,6 +37,7 @@ mine_count = 3
 enemy_count = settings.ENEMY_NR_START
 stage = 1
 bos_time = False
+shooting = False
 
 # Load assets
 background_image = pygame.transform.scale(pygame.image.load(path.join(settings.IMG_DIR, 'starfield.png')).convert(),(settings.WIDTH,settings.HEIGHT))
@@ -76,21 +77,30 @@ running = True
 # Process User Inputs this can be a different class as well
 def process_inputs():
     global running
+    global shooting
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_SPACE:
-                new_bullets = player.shoot()
-                if new_bullets:
-                    all_sprites.add(new_bullets)
-                    bullets_group.add(new_bullets)
+                shooting = True
             if event.key == pygame.K_ESCAPE:
                 running = False
             if event.key == pygame.K_b:
                 # DROP a mine
                 pass
+        if event.type == pygame.KEYUP:
+            if event.key == pygame.K_SPACE:
+                shooting = False
+        
 
+def shoot(ready):
+    if ready:
+        new_bullets = player.shoot()
+        if new_bullets:
+            all_sprites.add(new_bullets)
+            bullets_group.add(new_bullets)
+    
 def draw_shield_bar(surf, x, y, pct):
     if pct < 0:
         pct = 0
@@ -202,10 +212,11 @@ while running:
     clock.tick(settings.FPS)    
     # Process Input Events
     process_inputs()
-
+    
     # Updates
+    shoot(shooting)
     all_sprites.update()
-
+    
     # check for collissions
     check_for_payload_collissions()
 

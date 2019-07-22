@@ -13,7 +13,7 @@ class Player(pygame.sprite.Sprite):
     SHOOT_SOUND_1 = None
     SHOOT_SOUND_2 = None
     SHIELD = 100
-    SHOOT_DELAY = 200
+    SHOOT_DELAY = 220
 
     def __init__(self, settings):
         pygame.sprite.Sprite.__init__(self)
