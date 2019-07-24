@@ -10,6 +10,7 @@ import settings
 from actors.payload import Payload
 from actors.player import Player
 from actors.mob import Mob
+from actors.explosion import Explosion, Explosion_Animation
 from helper.text_helpers import draw_text
 
 
@@ -38,7 +39,7 @@ enemy_count = settings.ENEMY_NR_START
 stage = 1
 bos_time = False
 shooting = False
-
+explosion_animation = Explosion_Animation().get_explosion_images()
 # Load assets
 background_image = pygame.transform.scale(pygame.image.load(path.join(settings.IMG_DIR, 'starfield.png')).convert(),(settings.WIDTH,settings.HEIGHT))
 background_rect = background_image.get_rect()
@@ -117,16 +118,21 @@ def check_for_payload_collissions():
     global running
     payload_hit = pygame.sprite.groupcollide(payload_group, mobs_group, True, True, pygame.sprite.collide_circle)
     if payload_hit:
-        add_one_mob()
-        payload_count -= 1
-        if payload_count == 0:
-            running = False
+        for hit in payload_hit:
+            add_one_mob()
+            explosion = Explosion(hit.rect.center, 'lg', explosion_animation)
+            all_sprites.add(explosion)
+            payload_count -= 1
+            if payload_count == 0:
+                running = False
 
 def check_for_bullet_collisions():
     bullet_hits = pygame.sprite.groupcollide(mobs_group, bullets_group, True, True)
     l_hit_count = 0
     for hit in bullet_hits:
         l_hit_count += 1
+        explosion = Explosion(hit.rect.center, 'lg', explosion_animation)
+        all_sprites.add(explosion)
         random.choice(expl_sounds).play()
     return l_hit_count
 
@@ -157,9 +163,9 @@ def move_earth():
 
 def increase_earth_gap():
     if payload != None and payload.target_x > 50:
-        payload.target_x -= 5
+        payload.target_x -= 20
     if payload2 != None and payload2.target_x < settings.WIDTH - 50:
-        payload2.target_x +=5     
+        payload2.target_x +=20     
 
 def add_second_earth():
     global payload2
@@ -181,6 +187,11 @@ def check_for_player_collision():
     for hit in hits:
         damage = hit.radius * 2
         running = player.update_shield(damage)
+        if running:
+            explosion = Explosion(hit.rect.center, 'sm', explosion_animation)
+        else:
+            explosion = Explosion(hit.rect.center, 'lg', explosion_animation)
+        all_sprites.add(explosion)
         add_one_mob()
 
 def end_of_stage_bos(stage):
