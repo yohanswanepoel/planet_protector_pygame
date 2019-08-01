@@ -186,11 +186,15 @@ def check_for_player_collision():
     hits = pygame.sprite.spritecollide(player, mobs_group, True, pygame.sprite.collide_circle) 
     for hit in hits:
         damage = hit.radius * 2
-        running = player.update_shield(damage)
-        if running:
-            explosion = Explosion(hit.rect.center, 'sm', explosion_animation)
-        else:
+        explode_player = player.update_shield(damage)
+        if explode_player:
             explosion = Explosion(hit.rect.center, 'lg', explosion_animation)
+            player.lives -= 1
+            if player.lives == 0:
+                running = False
+        else:
+            explosion = Explosion(hit.rect.center, 'sm', explosion_animation)
+            
         all_sprites.add(explosion)
         add_one_mob()
 
@@ -256,7 +260,7 @@ while running:
     screen.fill(settings.BLACK)
     screen.blit(background_image, background_rect)
     all_sprites.draw(screen)
-    draw_text(font_name, settings.WHITE, screen, 'S %d L %d - Mines %d - Score %d' % (stage, current_level, mine_count, hit_count), 18, settings.WIDTH / 2, 10)
+    draw_text(font_name, settings.WHITE, screen, 'S %d L %d - Mines %d - Score %d - Lives %d' % (stage, current_level, mine_count, hit_count, player.lives), 18, settings.WIDTH / 2, 10)
     draw_shield_bar(screen, 5, 5, player.shield)
     # After the drawing flip the screen to display
     pygame.display.flip()
