@@ -43,6 +43,9 @@ class Player(pygame.sprite.Sprite):
         self.speedx = 0
         # self.image.set_colorkey(BLACK) # Create transparency for us
     
+    def get_image(self):
+        return self.image
+        
     def update(self):
         # Unhide
         if self.hidden and pygame.time.get_ticks() - self.hide_timer > self.HIDE_TIME:

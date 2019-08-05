@@ -62,8 +62,13 @@ mobs_group = pygame.sprite.Group()
 bullets_group = pygame.sprite.Group()
 payload_group = pygame.sprite.Group()
 
+
+
 player = Player(settings)
 all_sprites.add(player)
+
+player_mini_image = pygame.transform.scale(player.get_image(), (25,19))
+player_mini_image.set_colorkey(settings.BLACK)
 
 payload = Payload(settings.CENTER, Payload.EARTH_1, settings.WIDTH, settings.HEIGHT)
 payload2 = None
@@ -94,6 +99,12 @@ def process_inputs():
             if event.key == pygame.K_SPACE:
                 shooting = False
         
+def draw_lives(surf, x, y, lives, img):
+    for i in range(player.lives):
+        img_rect = img.get_rect()
+        img_rect.x = x + 30 * i
+        img_rect.y = y
+        surf.blit(img, img_rect)
 
 def shoot(ready):
     if ready:
@@ -260,7 +271,8 @@ while running:
     screen.fill(settings.BLACK)
     screen.blit(background_image, background_rect)
     all_sprites.draw(screen)
-    draw_text(font_name, settings.WHITE, screen, 'S %d L %d - Mines %d - Score %d - Lives %d' % (stage, current_level, mine_count, hit_count, player.lives), 18, settings.WIDTH / 2, 10)
+    draw_lives(screen, settings.WIDTH - 100, 5, player.lives, player_mini_image)
+    draw_text(font_name, settings.WHITE, screen, 'S %d L %d - Mines %d - Score %d ' % (stage, current_level, mine_count, hit_count), 18, settings.WIDTH / 2, 10)
     draw_shield_bar(screen, 5, 5, player.shield)
     # After the drawing flip the screen to display
     pygame.display.flip()
