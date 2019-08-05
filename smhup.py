@@ -6,7 +6,7 @@ import pygame
 import random
 import os
 from os import path
-import settings
+from settings import *
 from actors.payload import Payload
 from actors.player import Player
 from actors.mob import Mob
@@ -28,31 +28,31 @@ font_name = pygame.font.match_font('arial')
 pygame.init()
 pygame.mixer.init()
 pygame.mixer.fadeout(70)
-screen = pygame.display.set_mode((settings.WIDTH, settings.HEIGHT))
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Shout'em Up Space Game")
 clock = pygame.time.Clock()
 hit_count = 0
 payload_count = 1
 current_level = 1
 mine_count = 3
-enemy_count = settings.ENEMY_NR_START
+enemy_count = ENEMY_NR_START
 stage = 1
 bos_time = False
 shooting = False
 explosion_animation = Explosion_Animation().get_explosion_images()
 # Load assets
-background_image = pygame.transform.scale(pygame.image.load(path.join(settings.IMG_DIR, 'starfield.png')).convert(),(settings.WIDTH,settings.HEIGHT))
+background_image = pygame.transform.scale(pygame.image.load(path.join(IMG_DIR, 'starfield.png')).convert(),(WIDTH,HEIGHT))
 background_rect = background_image.get_rect()
 
 expl_sounds = []
 for snd in ['expl3.wav', 'expl6.wav']:
-    expl_sounds.append(pygame.mixer.Sound(path.join(settings.SOUND_DIR, snd)))
+    expl_sounds.append(pygame.mixer.Sound(path.join(SOUND_DIR, snd)))
 for snd in expl_sounds:
-    snd.set_volume(settings.EXPLOSION_VOLUME)
+    snd.set_volume(EXPLOSION_VOLUME)
 
 # Load music
-pygame.mixer.music.load(path.join(settings.SOUND_DIR,'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
-pygame.mixer.music.set_volume(settings.MUSIC_VOLUME)
+pygame.mixer.music.load(path.join(SOUND_DIR,'tgfcoder-FrozenJam-SeamlessLoop.ogg'))
+pygame.mixer.music.set_volume(MUSIC_VOLUME)
 
 # player_img = pygame.image.load(os.path.join(img_folder, 'p1_jump.png')).convert()
 
@@ -68,9 +68,9 @@ player = Player(settings)
 all_sprites.add(player)
 
 player_mini_image = pygame.transform.scale(player.get_image(), (25,19))
-player_mini_image.set_colorkey(settings.BLACK)
+player_mini_image.set_colorkey(BLACK)
 
-payload = Payload(settings.CENTER, Payload.EARTH_1, settings.WIDTH, settings.HEIGHT)
+payload = Payload(CENTER, Payload.EARTH_1, WIDTH, HEIGHT)
 payload2 = None
 all_sprites.add(payload)
 
@@ -121,8 +121,8 @@ def draw_shield_bar(surf, x, y, pct):
     fil = (pct / 100) * BAR_LENGTH
     outline_rect = pygame.Rect(x, y, BAR_LENGTH, BAR_HEIGHT)
     fill_rect = pygame.Rect(x, y, fil, BAR_HEIGHT)
-    pygame.draw.rect(surf, settings.GREEN, fill_rect)
-    pygame.draw.rect(surf, settings.WHITE, outline_rect, 2)
+    pygame.draw.rect(surf, GREEN, fill_rect)
+    pygame.draw.rect(surf, WHITE, outline_rect, 2)
 
 def check_for_payload_collissions():
     global payload_count
@@ -150,7 +150,7 @@ def check_for_bullet_collisions():
 def determine_level(current_level, hit_count):
     global mine_count
     global enemy_count
-    if (hit_count % settings.LEVEL_UP) == 0:
+    if (hit_count % LEVEL_UP) == 0:
         mine_count = 3
         current_level += 1 # Level Up
         #enemy_count += 1
@@ -170,20 +170,20 @@ def determine_level(current_level, hit_count):
     return current_level
 
 def move_earth():
-    payload.target_x = random.randrange(50, settings.WIDTH - 50, 5)
+    payload.target_x = random.randrange(50, WIDTH - 50, 5)
 
 def increase_earth_gap():
     if payload != None and payload.target_x > 50:
         payload.target_x -= 20
-    if payload2 != None and payload2.target_x < settings.WIDTH - 50:
+    if payload2 != None and payload2.target_x < WIDTH - 50:
         payload2.target_x +=20     
 
 def add_second_earth():
     global payload2
     global payload_count
     payload_count += 1
-    payload.target_x = settings.CENTER - 50
-    payload2 = Payload(settings.CENTER + 50, Payload.EARTH_2, settings.WIDTH, settings.HEIGHT)
+    payload.target_x = CENTER - 50
+    payload2 = Payload(CENTER + 50, Payload.EARTH_2, WIDTH, HEIGHT)
     all_sprites.add(payload2)
     payload_group.add(payload2)
 
@@ -230,12 +230,12 @@ def next_stage(stage):
         player.shield = 100
     else:
         player.shield = 75
-    add_mob(settings.ENEMY_NR_START + stage)
+    add_mob(ENEMY_NR_START + stage)
 
-add_mob(settings.ENEMY_NR_START)
+add_mob(ENEMY_NR_START)
 
 while running:
-    clock.tick(settings.FPS)    
+    clock.tick(FPS)    
     # Process Input Events
     process_inputs()
     
@@ -268,11 +268,11 @@ while running:
     check_for_player_collision()
     
     # Render Draw
-    screen.fill(settings.BLACK)
+    screen.fill(BLACK)
     screen.blit(background_image, background_rect)
     all_sprites.draw(screen)
-    draw_lives(screen, settings.WIDTH - 100, 5, player.lives, player_mini_image)
-    draw_text(font_name, settings.WHITE, screen, 'S %d L %d - Mines %d - Score %d ' % (stage, current_level, mine_count, hit_count), 18, settings.WIDTH / 2, 10)
+    draw_lives(screen, WIDTH - 100, 5, player.lives, player_mini_image)
+    draw_text(font_name, WHITE, screen, 'S %d L %d - Mines %d - Score %d ' % (stage, current_level, mine_count, hit_count), 18, WIDTH / 2, 10)
     draw_shield_bar(screen, 5, 5, player.shield)
     # After the drawing flip the screen to display
     pygame.display.flip()
